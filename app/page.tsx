@@ -81,9 +81,13 @@ export default function Home() {
                   ISAAC, Faith
                 </h2>
                 <p className=' max-w-lg mt-3 text-xl leading-relaxed text-gray-600 md:mt-8'>
-                  A graphic designer proficient in adobe creative suite
-                  (photoshop, illustrator, indesign),strong knowledge of graphic
-                  design principles, typography, and colortheory
+                  Hello! My name is Isaac Faith, and I&apos;m a graphic designer
+                  extraordinaire. I specialize in crafting captivating visuals
+                  that leave a lasting impression. From eye-catching logos to
+                  stunning digital designs, I bring ideas to life with
+                  creativity and purpose. Step into my portfolio and discover
+                  how I can help your brand shine and connect with your target
+                  audience!
                 </p>
                 <p className='mt-4 text-xl text-gray-600 md:mt-8'>
                   <span className='relative inline-block'>
@@ -94,6 +98,8 @@ export default function Home() {
                   <a
                     href='https://twitter.com/faithybubu'
                     className='transition-all duration-200 text-sky-500 hover:text-sky-600 hover:underline'
+                    target='_blank'
+                    rel='noopenner'
                   >
                     Twitter
                   </a>{" "}
@@ -101,6 +107,8 @@ export default function Home() {
                   <a
                     href='https://www.linkedin.com/in/faith-isaac-796678195/'
                     className='transition-all duration-200 text-sky-500 hover:text-sky-600 hover:underline'
+                    target='_blank'
+                    rel='noopenner'
                   >
                     LinkedIn
                   </a>
