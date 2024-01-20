@@ -8,6 +8,7 @@ import { useResizeObserver } from "@wojtekmaj/react-hooks";
 
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
+import Image from "next/image";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
@@ -106,15 +107,17 @@ export default function Home() {
                 </p>
               </div>
               <div className='relative'>
-                <img
+                {/* <img
                   className='absolute inset-x-0 bottom-0 -mb-48 -translate-x-1/2 left-1/2'
                   src='https://cdn.rareblocks.xyz/collection/celebration/images/team/1/blob-shape.svg'
-                  alt
-                />
-                <img
+                  alt=''
+                /> */}
+                <Image
                   className='relative w-full xl:max-w-lg xl:mx-auto 2xl:origin-bottom 2xl:scale-110'
-                  src='./faith.jpeg'
-                  alt
+                  src='/faith.jpeg'
+                  alt='Isaac Faith'
+                  width='500'
+                  height='500'
                 />
               </div>
             </div>
