@@ -1,113 +1,173 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { pdfjs } from "react-pdf";
+import { useCallback, useState } from "react";
+import { Document, Page } from "react-pdf";
+import type { PDFDocumentProxy } from "pdfjs-dist";
+import { useResizeObserver } from "@wojtekmaj/react-hooks";
+
+import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+import "react-pdf/dist/esm/Page/TextLayer.css";
+
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.js",
+  import.meta.url
+).toString();
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+
+const options = {
+  cMapUrl: "/cmaps/",
+  standardFontDataUrl: "/standard_fonts/",
+};
+
+const resizeObserverOptions = {};
+
+const maxWidth = 800;
+
+type PDFFile = string | File | null;
+
+const Button = ({
+  onClick,
+  children,
+}: {
+  onClick?: () => void;
+  children: React.ReactNode;
+}) => {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <button
+      onClick={() => {
+        if (onClick) onClick();
+      }}
+      className='border border-slate-200 py-1.5 px-2 rounded'
+    >
+      {children}
+    </button>
+  );
+};
+export default function Home() {
+  const [filePath, _] = useState<PDFFile>("/portfolio.pdf");
+  const [numPages, setNumPages] = useState<number>();
+  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [containerRef, setContainerRef] = useState<HTMLElement | null>(null);
+  const [containerWidth, setContainerWidth] = useState<number>();
+
+  function onDocumentLoadSuccess({
+    numPages: nextNumPages,
+  }: PDFDocumentProxy): void {
+    setNumPages(nextNumPages);
+  }
+
+  const onResize = useCallback<ResizeObserverCallback>((entries) => {
+    const [entry] = entries;
+
+    if (entry) {
+      setContainerWidth(entry.contentRect.width);
+    }
+  }, []);
+
+  useResizeObserver(containerRef, resizeObserverOptions, onResize);
+
+  return (
+    <>
+      <main className='flex min-h-screen flex-col items-center justify-center lg:justify-between gap-10 bg-slate-800'>
+        <section className='w-full *:pt-10 overflow-hidden bg-gray-50 md:pt-0 sm:pt-16 2xl:pt-16'>
+          <div className='px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl'>
+            <div className='grid items-center grid-cols-1 md:grid-cols-2'>
+              <div>
+                <h2 className='text-3xl font-bold leading-tight text-black sm:text-4xl lg:text-5xl'>
+                  Hey 👋 I am <br className='block sm:hidden' />
+                  ISAAC, Faith
+                </h2>
+                <p className=' max-w-lg mt-3 text-xl leading-relaxed text-gray-600 md:mt-8'>
+                  A graphic designer proficient in adobe creative suite
+                  (photoshop, illustrator, indesign),strong knowledge of graphic
+                  design principles, typography, and colortheory
+                </p>
+                <p className='mt-4 text-xl text-gray-600 md:mt-8'>
+                  <span className='relative inline-block'>
+                    <span className='absolute inline-block w-full bottom-0.5 h-2 bg-yellow-300' />
+                    <span className='relative'> Have a question? </span>
+                  </span>
+                  <br className='block sm:hidden' /> Ask me on{" "}
+                  <a
+                    href='https://twitter.com/faithybubu'
+                    className='transition-all duration-200 text-sky-500 hover:text-sky-600 hover:underline'
+                  >
+                    Twitter
+                  </a>{" "}
+                  or{" "}
+                  <a
+                    href='https://www.linkedin.com/in/faith-isaac-796678195/'
+                    className='transition-all duration-200 text-sky-500 hover:text-sky-600 hover:underline'
+                  >
+                    LinkedIn
+                  </a>
+                </p>
+              </div>
+              <div className='relative'>
+                <img
+                  className='absolute inset-x-0 bottom-0 -mb-48 -translate-x-1/2 left-1/2'
+                  src='https://cdn.rareblocks.xyz/collection/celebration/images/team/1/blob-shape.svg'
+                  alt
+                />
+                <img
+                  className='relative w-full xl:max-w-lg xl:mx-auto 2xl:origin-bottom 2xl:scale-110'
+                  src='./faith.jpeg'
+                  alt
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className='flex items-center gap-3'>
+          {pageNumber !== 1 ? (
+            <Button
+              onClick={() => {
+                setPageNumber(pageNumber - 1);
+              }}
+            >
+              Prev
+            </Button>
+          ) : null}
+          <p>
+            Page {pageNumber} of {numPages}
+          </p>
+          {numPages && numPages > pageNumber ? (
+            <Button
+              onClick={() => {
+                setPageNumber(pageNumber + 1);
+              }}
+            >
+              Next
+            </Button>
+          ) : null}
+        </section>
+        <section
+          ref={setContainerRef}
+          className='flex justify-center items-center w-full'
+        >
+          <Document
+            file={filePath}
+            onLoadSuccess={onDocumentLoadSuccess}
+            options={options}
           >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
+            <Page
+              pageNumber={pageNumber}
+              width={
+                containerWidth ? Math.min(containerWidth, maxWidth) : maxWidth
+              }
+              // scale={1.5}
+              renderAnnotationLayer={false}
+              renderTextLayer={false}
             />
-          </a>
-        </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+          </Document>
+        </section>
+      </main>
+      <footer className='bg-slate-800 p-5 text-center'>
+        Isaac Faith © {new Date().getFullYear()}
+      </footer>
+    </>
   );
 }
