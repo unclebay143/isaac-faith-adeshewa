@@ -5,6 +5,10 @@ const nextConfig = {
 
     return config;
   },
+  images: {
+    domains: ["cdn.hashnode.com"],
+    minimumCacheTTL: 1500000,
+  },
 };
 
 export default nextConfig;
